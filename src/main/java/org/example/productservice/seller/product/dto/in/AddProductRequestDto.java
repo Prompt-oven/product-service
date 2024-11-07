@@ -3,12 +3,17 @@ package org.example.productservice.seller.product.dto.in;
 import org.example.productservice.common.domain.Product;
 import org.example.productservice.common.domain.ProductPolicy;
 import org.example.productservice.global.common.UuidGenerator;
+import org.example.productservice.seller.product.presentation.AddProductRequestVo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Builder
 public class AddProductRequestDto {
 
 	private String sellerUuid;
@@ -16,6 +21,8 @@ public class AddProductRequestDto {
 	private String sellerName;
 
 	private int price;
+
+	private String productName;
 
 	private String prompt;
 
@@ -25,27 +32,29 @@ public class AddProductRequestDto {
 
 	private boolean enabled;
 
-	private boolean premium;
-
 	private String thumbnailSrc;
 
 	private boolean approved;
 
 	private Long llmId;
 
-	public AddProductRequestDto(String sellerUuid, String sellerName, int price, String prompt, String description,
-		float discountRate, boolean enabled, boolean premium, String thumbnailSrc, boolean approved, Long llmId) {
-		this.sellerUuid = sellerUuid;
-		this.sellerName = sellerName;
-		this.price = price;
-		this.prompt = prompt;
-		this.description = description;
-		this.discountRate = discountRate;
-		this.enabled = enabled;
-		this.premium = premium;
-		this.thumbnailSrc = thumbnailSrc;
-		this.approved = approved;
-		this.llmId = llmId;
+	private String llmName;
+
+	public static AddProductRequestDto toDto(AddProductRequestVo addProductRequestVo) {
+		return AddProductRequestDto.builder()
+			.sellerUuid(addProductRequestVo.getSellerUuid())
+			.sellerName(addProductRequestVo.getSellerName())
+			.price(addProductRequestVo.getPrice())
+			.productName(addProductRequestVo.getProductName())
+			.prompt(addProductRequestVo.getPrompt())
+			.description(addProductRequestVo.getDescription())
+			.discountRate(addProductRequestVo.getDiscountRate())
+			.enabled(addProductRequestVo.isEnabled())
+			.thumbnailSrc(addProductRequestVo.getThumbnailSrc())
+			.approved(addProductRequestVo.isApproved())
+			.llmId(addProductRequestVo.getLlmId())
+			.llmName(addProductRequestVo.getLlmName())
+			.build();
 	}
 
 	public Product createProduct() {
@@ -53,43 +62,22 @@ public class AddProductRequestDto {
 			.productUuid(UuidGenerator.generateProductUuid())
 				.sellerUuid(sellerUuid)
 				.sellerName(sellerName)
+				.productName(productName)
 				.price(price)
 				.prompt(prompt)
 				.description(description)
 				.build();
 	}
 
-	public ProductPolicy createProductPolicy(Product product) {
+	public ProductPolicy createProductPolicy(String productUuid) {
 		return ProductPolicy.builder()
-				.product(product)
+				.productUuid(productUuid)
 				.discountRate(discountRate)
 				.enabled(enabled)
-				.premium(premium)
 				.thumbnailSrc(thumbnailSrc)
 				.approved(approved)
 				.llmId(llmId)
+				.llmName(llmName)
 				.build();
-	}
-
-	public Product updateProduct(Long productId) {
-		return Product.builder()
-			.productId(productId)
-			.sellerUuid(sellerUuid)
-			.price(price)
-			.prompt(prompt)
-			.description(description)
-			.build();
-	}
-
-	public ProductPolicy updateProductPolicy(Product product) {
-		return ProductPolicy.builder()
-			.product(product)
-			.discountRate(discountRate)
-			.enabled(enabled)
-			.premium(premium)
-			.thumbnailSrc(thumbnailSrc)
-			.approved(approved)
-			.llmId(llmId)
-			.build();
 	}
 }
